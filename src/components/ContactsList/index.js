@@ -1,12 +1,10 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 import Contact from "../Contact";
 
-import { getContacts, deleteContact } from "../../utils/ContactsAPI";
-
 export default class ContactsList extends React.Component {
   state = {
-    contacts: [],
     query: "",
   };
 
@@ -16,31 +14,10 @@ export default class ContactsList extends React.Component {
     });
   };
 
-  componentDidMount() {
-    getContacts().then((response) => {
-      this.setState({
-        contacts: response.contacts,
-      });
-    });
-  }
-
-  handleDeleteContact = (contact) => {
-    this.setState(
-      (prevState) => ({
-        contacts: prevState.contacts.filter((cont) => cont.id !== contact.id),
-      }),
-      () => {
-        deleteContact(contact);
-      }
-    );
-  };
-
-  onDeleteContact = (contact) => {
-    this.handleDeleteContact(contact);
-  };
-
   render() {
-    const { contacts, query } = this.state;
+    const { query } = this.state;
+    const { contacts } = this.props.data;
+    const { onDeleteContact } = this.props.actions;
 
     const showingContacts =
       query === ""
@@ -59,6 +36,7 @@ export default class ContactsList extends React.Component {
             placeholder="Search for contact"
             onChange={(e) => this.handleQuery(e.target.value)}
           />
+          <Link to="/create" className="add-contact" />
         </div>
         {showingContacts.length !== contacts.length && (
           <div className="showing-contacts">
@@ -74,7 +52,7 @@ export default class ContactsList extends React.Component {
           <Contact
             key={contact.id}
             data={{ contact }}
-            actions={{ handleDeleteContact: this.onDeleteContact }}
+            actions={{ handleDeleteContact: onDeleteContact }}
           />
         ))}
       </div>
