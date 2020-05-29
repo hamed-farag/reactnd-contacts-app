@@ -1,8 +1,10 @@
 import React, { Component } from "react";
+import { Route } from "react-router-dom";
 
 import ContactsList from "./components/ContactsList";
+import CreateContact from "./components/CreateContact";
 
-import { getContacts, deleteContact } from "./utils/ContactsAPI";
+import { getContacts, deleteContact, createContact } from "./utils/ContactsAPI";
 
 class App extends Component {
   state = {
@@ -20,6 +22,17 @@ class App extends Component {
     );
   };
 
+  handleCreateContact = (values) => {
+    this.setState(
+      (prevState) => ({
+        contacts: [...prevState.contacts, values],
+      }),
+      () => {
+        createContact(values);
+      }
+    );
+  };
+
   componentDidMount() {
     getContacts().then((response) => {
       this.setState({
@@ -30,10 +43,27 @@ class App extends Component {
 
   render() {
     return (
-      <ContactsList
-        data={{ contacts: this.state.contacts }}
-        actions={{ onDeleteContact: this.handleDeleteContact }}
-      />
+      <div>
+        <Route
+          exact
+          path="/"
+          render={() => (
+            <ContactsList
+              data={{ contacts: this.state.contacts }}
+              actions={{ onDeleteContact: this.handleDeleteContact }}
+            />
+          )}
+        />
+        <Route
+          path="/create"
+          render={({ history }) => (
+            <CreateContact
+              history={history}
+              actions={{ onCreateContact: this.handleCreateContact }}
+            />
+          )}
+        />
+      </div>
     );
   }
 }
